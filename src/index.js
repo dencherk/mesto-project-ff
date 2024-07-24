@@ -1,19 +1,21 @@
 import "./pages/index.css"; // добавьте импорт главного файла стилей
 import { initialCards } from "./scripts/cards.js";
 import { createCard, deleteCard, likeButtonClick } from "./components/cards.js";
-import { openPopup, closePopup } from "./components/modal.js";
+import { openPopup, closePopup, handleEscape } from "./components/modal.js";
 
 // @todo: DOM узлы
 const placesList = document.querySelector(".places__list");
 const profileEditButton = document.querySelector(".profile__edit-button");
 const profilePopup = document.querySelector(".popup_type_edit");
-const popupClose = document.querySelectorAll(".popup__close");
+const popupsClose = document.querySelectorAll(".popup__close");
 const addCardButton = document.querySelector(".profile__add-button");
 const addCardPopup = document.querySelector(".popup_type_new-card");
 const imagePopup = document.querySelector(".popup_type_image");
+const imagePopupCaption = imagePopup.querySelector('.popup__caption');
+const imagePopupLink = imagePopup.querySelector('.popup__image');
 
 // Находим форму в DOM
-const formElement = document.forms["edit-profile"]; // Воспользуйтесь методом querySelector()
+const profileForm = document.forms["edit-profile"]; // Воспользуйтесь методом querySelector()
 // Находим поля формы в DOM
 const nameInput = document.querySelector(".profile__title"); // Воспользуйтесь инструментом .querySelector()
 const jobInput = document.querySelector(".profile__description"); // Воспользуйтесь инструментом .querySelector()
@@ -26,6 +28,9 @@ initialCards.forEach(function (cardItem) {
 
 // Открытие Попапа профиля
 profileEditButton.addEventListener("click", function () {
+  //заполняем поля формы
+profileForm.elements.name.value = nameInput.textContent;
+profileForm.elements.description.value = jobInput.textContent;
   openPopup(profilePopup);
 });
 
@@ -36,14 +41,14 @@ addCardButton.addEventListener("click", function (evt) {
 
 // открытие катринки карточки
 function imageClick(cardItem) {
-  imagePopup.querySelector(".popup__image").src = cardItem.link;
-  imagePopup.querySelector(".popup__image").alt = cardItem.name;
-  imagePopup.querySelector(".popup__caption").textContent = cardItem.name;
+  imagePopupLink.src = cardItem.link;
+  imagePopup.alt = cardItem.name;
+  imagePopupCaption.textContent = cardItem.name;
   openPopup(imagePopup);
 }
 
 // Закрытие Попапа кнопкой
-popupClose.forEach((item) => {
+popupsClose.forEach((item) => {
   item.addEventListener("click", function (evt) {
     closePopup(evt.target.closest(".popup"));
   });
@@ -55,28 +60,18 @@ document.addEventListener("click", function (evt) {
   if (popup && evt.target === popup) closePopup(popup);
 });
 
-document.addEventListener("keydown", function (evt) {
-  const activePopup = document.querySelector(".popup_is-opened");
-  if (evt.key === "Escape" && activePopup) {
-    closePopup(activePopup);
-  }
-});
-
-//заполняем поля формы
-formElement.elements.name.value = nameInput.textContent;
-formElement.elements.description.value = jobInput.textContent;
 
 // Обработчик «отправки» формы, хотя пока
 // она никуда отправляться не будет
 function handleFormSubmit(evt) {
   evt.preventDefault();
-  nameInput.textContent = formElement.elements.name.value;
-  jobInput.textContent = formElement.elements.description.value;
+  nameInput.textContent = profileForm.elements.name.value;
+  jobInput.textContent = profileForm.elements.description.value;
   closePopup(evt.target.closest(".popup"));
 }
 // Прикрепляем обработчик к форме:
 // он будет следить за событием “submit” - «отправка»
-formElement.addEventListener("submit", handleFormSubmit);
+profileForm.addEventListener("submit", handleFormSubmit);
 
 //добавление новой карточки
 const addCardForm = document.forms["new-place"];
