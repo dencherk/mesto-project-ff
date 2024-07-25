@@ -16,5 +16,5 @@ export function openPopup(popup) {
 export function closePopup(popup) {
   popup.classList.add("popup_is-animated");
   popup.classList.remove("popup_is-opened");
-  document.addEventListener('keydown', handleEscape);
+  document.removeEventListener('keydown', handleEscape);
 }
