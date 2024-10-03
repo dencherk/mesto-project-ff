@@ -10,6 +10,24 @@
   margin-bottom: 10px;
 }
 
+/* Поле ввода с ошибкой */
+.popup__input_type_error {
+  border-color: red; /* Красная граница для невалидного поля */
+}
+/* Стили для ошибки */
+.popup__error {
+  color: red; /* Цвет текста ошибки */
+  font-size: 12px;
+  line-height: 14px;
+  margin-top: 5px;
+  display: none; /* Ошибка скрыта по умолчанию */
+}
+
+/* Ошибка активна */
+.popup__error_visible {
+  display: block;
+}
+
 .popup__input:last-of-type {
   margin-bottom: 0;
 }

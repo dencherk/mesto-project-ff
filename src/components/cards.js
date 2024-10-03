@@ -1,35 +1,69 @@
-// @todo: Темплейт карточки
-const cardTemplate = document.querySelector("#card-template").content;
-// @todo: Функция создания карточки
-export function createCard(cardItem, deleteCard, likeButtonClick, imageClick) {
-  const placesItem = cardTemplate
-    .querySelector(".places__item")
-    .cloneNode(true);
+import { changeLike, deleteCard } from "./api.js";
+import { imageClick } from "../index.js";
+
+export function createCard(
+  cardData,
+  userId,
+  deleteCard,
+  likeButtonClick,
+  open
+) {
+  const cardTemplate = document.querySelector("#card-template").content;
+  const placesItem = cardTemplate.querySelector(".card").cloneNode(true);
   const cardImage = placesItem.querySelector(".card__image");
   const cardTitle = placesItem.querySelector(".card__title");
   const cardDeleteButton = placesItem.querySelector(".card__delete-button");
   const cardLikeButton = placesItem.querySelector(".card__like-button");
+  const likeCount = placesItem.querySelector(".card__like-count");
 
-  cardImage.src = cardItem.link;
-  cardImage.alt = cardItem.name;
-  cardTitle.textContent = cardItem.name;
+  // Устанавливаем данные карточки
+  cardImage.src = cardData.link;
+  cardImage.alt = cardData.name;
+  cardTitle.textContent = cardData.name;
+  likeCount.textContent = cardData.likes.length;
 
-  cardDeleteButton.addEventListener("click", deleteCard);
-  cardLikeButton.addEventListener("click", () =>
-    likeButtonClick(cardLikeButton)
-  );
-  cardImage.addEventListener("click", () => imageClick(cardItem));
+  cardImage.addEventListener("click", () => imageClick(cardData));
 
-  return placesItem;
-}
+  // Управление кнопкой удаления
+  if (cardData.owner._id === userId) {
+    cardDeleteButton.addEventListener("click", () => {
+      deleteCard(cardData._id)
+        .then(() => {
+          placesItem.remove(); // Удаляем карточку из DOM
+        })
+        .catch((err) => {
+          console.error("Ошибка при удалении карточки:", err);
+        });
+    });
+  } else {
+    cardDeleteButton.remove();
+  }
 
-// @todo: Функция удаления карточки
-export function deleteCard(event) {
-  const listItem = event.target.closest(".places__item");
-  listItem.remove();
-}
+  // Проверка, был ли лайк
+  const isLiked = () => cardData.likes.some((like) => like._id === userId);
+  if (isLiked()) {
+    cardLikeButton.classList.add("card__like-button_is-active");
+  }
 
-//лайк карточки
-export function likeButtonClick(likeButton) {
-  likeButton.classList.toggle("card__like-button_is-active");
+  // Обработчик клика по кнопке лайка
+  cardLikeButton.addEventListener("click", () => {
+    const isCurrentlyLiked = cardLikeButton.classList.contains(
+      "card__like-button_is-active"
+    );
+
+    changeLike(cardData._id, !isCurrentlyLiked) // Функция для изменения лайка
+      .then((updatedCard) => {
+        likeCount.textContent = updatedCard.likes.length; // Обновляем количество лайков
+        cardLikeButton.classList.toggle("card__like-button_is-active"); // Переключаем класс активации
+      })
+      .catch((err) => {
+        console.error(`Ошибка при изменении лайка: ${err}`); // Логируем ошибки
+      });
+  });
+
+  if (open) {
+    cardImage.addEventListener("click", () => open(cardData));
+  }
+
+  return placesItem; // Возвращаем элемент карточки
 }
