@@ -625,6 +625,7 @@ template {
 }
 
 .profile__image {
+  position: relative;
   width: 120px;
   height: 120px;
   -webkit-border-radius: 50%;
@@ -633,6 +634,19 @@ template {
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+}
+
+.profile__image-cover {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  background: url(93c771f5f8582261951d.png) rgb(0 0 0 / 0.5) no-repeat center;
+}
+
+.profile__image-cover:hover {
+  opacity: 1;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 740px) {
@@ -727,6 +741,23 @@ template {
   opacity: 0.6;
 }
 
+.card__like-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.card__like-count {
+  height: 13px;
+  color: black;
+  font-family: Inter;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 15.73px;
+  text-align: center;
+}
+
 .card__like-button_is-active {
   background: transparent url(a7ffe37dcb927ba0c46c.svg) no-repeat;
 }
@@ -778,7 +809,7 @@ template {
 .popup__content {
   max-width: 430px;
   width: 100%;
-  min-height: 330px;
+  
   background-color: #fff;
   border-radius: 10px;
   position: relative;
@@ -861,6 +892,24 @@ template {
   box-sizing: border-box;
   padding: 10px 0 0;
   margin-bottom: 10px;
+}
+
+/* Поле ввода с ошибкой */
+.popup__input_type_error {
+  border-color: red; /* Красная граница для невалидного поля */
+}
+/* Стили для ошибки */
+.popup__error {
+  color: red; /* Цвет текста ошибки */
+  font-size: 12px;
+  line-height: 14px;
+  margin-top: 5px;
+  display: none; /* Ошибка скрыта по умолчанию */
+}
+
+/* Ошибка активна */
+.popup__error_visible {
+  display: block;
 }
 
 .popup__input:last-of-type {
