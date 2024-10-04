@@ -40,16 +40,21 @@ const hasInvalidInput = (inputList) => {
   });
 };
 
+// Новая функция для отключения кнопки отправки 
+const disableSubmitButton = (buttonElement, config) => { 
+  buttonElement.disabled = true; 
+  buttonElement.classList.add(config.inactiveButtonClass); 
+}; 
+
 // Функция переключения состояния кнопки отправки
 const toggleButtonState = (inputList, buttonElement, config) => {
   if (hasInvalidInput(inputList)) {
-    buttonElement.disabled = true;
-    buttonElement.classList.add(config.inactiveButtonClass);
-  } else {
-    buttonElement.disabled = false;
-    buttonElement.classList.remove(config.inactiveButtonClass);
-  }
-};
+    disableSubmitButton(buttonElement, config); 
+  } else { 
+    buttonElement.disabled = false; 
+    buttonElement.classList.remove(config.inactiveButtonClass); 
+  } 
+}; 
 
 // Функция добавления обработчиков событий для валидации полей формы
 const setEventListeners = (formElement, config) => {
@@ -83,6 +88,5 @@ const clearValidation = (form, config) => {
   const inputList = Array.from(form.querySelectorAll(config.inputSelector));
   const submitButton = form.querySelector(config.submitButtonSelector);
   inputList.forEach((input) => hideError(form, input, config)); // Здесь тоже используем правильную функцию
-  submitButton.disabled = true;
-  submitButton.classList.add(config.inactiveButtonClass);
+  disableSubmitButton(submitButton, config);
 };

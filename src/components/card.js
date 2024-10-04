@@ -4,8 +4,8 @@ import { imageClick } from "../index.js";
 export function createCard(
   cardData,
   userId,
-  deleteCard,
-  likeButtonClick,
+  deleteCallback,
+  likeCallback,
   open
 ) {
   const cardTemplate = document.querySelector("#card-template").content;
@@ -24,20 +24,14 @@ export function createCard(
 
   cardImage.addEventListener("click", () => imageClick(cardData));
 
-  // Управление кнопкой удаления
-  if (cardData.owner._id === userId) {
-    cardDeleteButton.addEventListener("click", () => {
-      deleteCard(cardData._id)
-        .then(() => {
-          placesItem.remove(); // Удаляем карточку из DOM
-        })
-        .catch((err) => {
-          console.error("Ошибка при удалении карточки:", err);
-        });
-    });
-  } else {
-    cardDeleteButton.remove();
-  }
+// Обработчик кнопки удаления
+if (cardData.owner._id === userId) {
+  cardDeleteButton.addEventListener("click", () => {
+    deleteCallback(cardData._id, placesItem); // Передаем данные в колбэк
+  });
+} else {
+  cardDeleteButton.remove();
+}
 
   // Проверка, был ли лайк
   const isLiked = () => cardData.likes.some((like) => like._id === userId);
@@ -45,21 +39,13 @@ export function createCard(
     cardLikeButton.classList.add("card__like-button_is-active");
   }
 
-  // Обработчик клика по кнопке лайка
-  cardLikeButton.addEventListener("click", () => {
-    const isCurrentlyLiked = cardLikeButton.classList.contains(
-      "card__like-button_is-active"
-    );
-
-    changeLike(cardData._id, !isCurrentlyLiked) // Функция для изменения лайка
-      .then((updatedCard) => {
-        likeCount.textContent = updatedCard.likes.length; // Обновляем количество лайков
-        cardLikeButton.classList.toggle("card__like-button_is-active"); // Переключаем класс активации
-      })
-      .catch((err) => {
-        console.error(`Ошибка при изменении лайка: ${err}`); // Логируем ошибки
-      });
-  });
+// Обработчик клика по кнопке лайка
+cardLikeButton.addEventListener("click", () => {
+  const isCurrentlyLiked = cardLikeButton.classList.contains("card__like-button_is-active");
+  
+  // Передаем данные в колбэк для изменения лайка
+  likeCallback(cardData._id, !isCurrentlyLiked, cardLikeButton, likeCount);
+});
 
   if (open) {
     cardImage.addEventListener("click", () => open(cardData));

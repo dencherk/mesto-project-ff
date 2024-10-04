@@ -9,8 +9,9 @@ import {
   checkUrl,
   handleError,
   patchNewAvatar,
+  changeLike,
 } from "./components/api.js";
-import { createCard } from "./components/cards.js";
+import { createCard } from "./components/card.js";
 import { openPopup, closePopup } from "./components/modal.js";
 
 const placesList = document.querySelector(".places__list");
@@ -53,11 +54,32 @@ export function imageClick(cardData) {
 // Сообщение о загрузке у кнопки 'submit'
 function renderLoading(isLoading, popup) {
   const button = popup.querySelector(".popup__button");
-  if (isLoading) {
-    button.textContent = "Сохранение...";
-  } else {
-    button.textContent = "Сохранить";
+  if (button) {
+    button.textContent = isLoading ? "Сохранение..." : "Сохранить";
   }
+}
+
+// Функция для удаления карточки (колбэк)
+function deleteCallback(cardId, placesItem) {
+  deleteCard(cardId)
+    .then(() => {
+      placesItem.remove(); // Удаляем карточку из DOM
+    })
+    .catch((err) => {
+      console.error("Ошибка при удалении карточки:", err);
+    });
+}
+
+// Колбэк для обработки изменения лайка
+function likeCallback(cardId, isLiked, cardLikeButton, likeCount) {
+  changeLike(cardId, isLiked)
+    .then((updatedCard) => {
+      likeCount.textContent = updatedCard.likes.length; // Обновляем количество лайков
+      cardLikeButton.classList.toggle("card__like-button_is-active"); // Переключаем класс активации
+    })
+    .catch((err) => {
+      console.error(`Ошибка при изменении лайка: ${err}`); // Логируем ошибки
+    });
 }
 
 Promise.all([getProfileInfo(), getInitialCards()])
@@ -72,7 +94,7 @@ Promise.all([getProfileInfo(), getInitialCards()])
     // Заполнение галереи карточками
     cards.forEach((item) => {
       placesList.append(
-        createCard(item, userID, deleteCard, {
+        createCard(item, userID, deleteCallback, likeCallback,  {
           open: imageClick,
         })
       );
@@ -147,8 +169,9 @@ addCardForm.addEventListener("submit", (event) => {
       const newCard = createCard(
         cardData,
         cardData.owner._id,
-        deleteCard,
-        imageClick
+        deleteCallback,
+        imageClick,
+        likeCallback
       );
       placesList.prepend(newCard);
       addCardForm.reset();
