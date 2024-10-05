@@ -94,9 +94,7 @@ Promise.all([getProfileInfo(), getInitialCards()])
     // Заполнение галереи карточками
     cards.forEach((item) => {
       placesList.append(
-        createCard(item, userID, deleteCallback, likeCallback,  {
-          open: imageClick,
-        })
+        createCard(item, userID, deleteCallback, likeCallback, imageClick)
       );
     });
   })
@@ -170,8 +168,8 @@ addCardForm.addEventListener("submit", (event) => {
         cardData,
         cardData.owner._id,
         deleteCallback,
-        imageClick,
-        likeCallback
+        likeCallback,  // Исправляем на правильный порядок
+        imageClick 
       );
       placesList.prepend(newCard);
       addCardForm.reset();
